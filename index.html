@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¡Felices 16, Mi Amor!</title>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --negro: #0a0010;
+    --morado-deep: #1a0030;
+    --morado-gengar: #6b21a8;
+    --morado-neon: #c026d3;
+    --rosa-kitty: #ff80b5;
+    --rosa-pastel: #ffd6e8;
+    --blanco-ghost: rgba(255,255,255,0.08);
+    --glass: rgba(107,33,168,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--negro);
+    font-family: 'Quicksand', sans-serif;
+    color: #f0d0ff;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  .cursor {
+    width: 20px; height: 20px;
+    border: 2px solid var(--rosa-kitty);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s, background 0.2s;
+    mix-blend-mode: screen;
+  }
+  .cursor.clicked { transform: scale(2.5); background: rgba(255,128,181,0.3); }
+
+  #bgCanvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .content { position: relative; z-index: 2; }
+
+  .hero {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    gap: 1rem;
+  }
+
+  .hero-badge {
+    font-size: 0.8rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--rosa-kitty);
+    opacity: 0.8;
+    animation: fadeSlideDown 1s ease both;
+  }
+
+  .hero-title {
+    font-family: 'Permanent Marker', cursive;
+    font-size: clamp(2.8rem, 9vw, 7rem);
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 0%, var(--rosa-kitty) 40%, var(--morado-neon) 80%, #a855f7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fadeSlideDown 1s 0.2s ease both;
+    filter: drop-shadow(0 0 30px rgba(192,38,211,0.6));
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    letter-spacing: 0.2em;
+    color: var(--rosa-pastel);
+    opacity: 0.9;
+    animation: fadeSlideDown 1s 0.4s ease both;
+  }
+
+  .gengar-float {
+    width: 120px;
+    animation: floatUp 4s ease-in-out infinite, fadeSlideDown 1s 0.6s ease both;
+    filter: drop-shadow(0 0 20px rgba(192,38,211,0.7));
+    margin: 1rem 0;
+  }
+
+  .glass-card {
+    background: var(--glass);
+    border: 1px solid rgba(192,38,211,0.25);
+    border-radius: 24px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 2.5rem 3rem;
+    max-width: 680px;
+    margin: 2rem auto;
+    box-shadow: 0 0 60px rgba(107,33,168,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+    animation: fadeSlideUp 1s 0.8s ease both;
+  }
+
+  .message-title { font-family: 'Permanent Marker', cursive; font-size: 1.6rem; color: var(--rosa-kitty); margin-bottom: 1.5rem; }
+  .message-body { font-size: 1.1rem; line-height: 1.8; color: rgba(240,208,255,0.9); font-weight: 500; }
+  .message-body em { color: var(--rosa-kitty); font-style: normal; font-weight: 700; }
+  .message-sign { margin-top: 2rem; font-family: 'Permanent Marker', cursive; font-size: 1.2rem; color: var(--morado-neon); text-align: right; }
+
+  .buttons-section { padding: 3rem 2rem; display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center; }
+
+  .btn-play {
+    background: linear-gradient(135deg, var(--morado-gengar), var(--morado-neon));
+    border: none; border-radius: 50px; padding: 1.2rem 2.5rem;
+    font-family: 'Permanent Marker', cursive; font-size: 1.2rem; color: white;
+    cursor: pointer; box-shadow: 0 0 30px rgba(192,38,211,0.5);
+    transition: transform 0.2s;
+  }
+  .btn-play:hover { transform: scale(1.06); }
+
+  .btn-regalo {
+    background: linear-gradient(135deg, #be185d, var(--rosa-kitty));
+    border: none; border-radius: 50px; padding: 1.2rem 2.5rem;
+    font-family: 'Permanent Marker', cursive; font-size: 1.1rem; color: white;
+    cursor: pointer; animation: pulseGlow 2s infinite;
+  }
+
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    z-index: 1000; backdrop-filter: blur(10px); align-items: center; justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-box {
+    background: linear-gradient(135deg, var(--morado-deep), #1e003d);
+    border: 2px solid var(--rosa-kitty); border-radius: 28px;
+    padding: 3rem; max-width: 440px; width: 90%; text-align: center;
+    animation: modalPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+
+  #confettiCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 500; opacity: 0; transition: opacity 0.3s; }
+  #confettiCanvas.active { opacity: 1; }
+
+  .footer { text-align: center; padding: 4rem 2rem; font-size: 0.85rem; color: rgba(240,208,255,0.3); }
+
+  @keyframes fadeSlideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes floatUp { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+  @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 20px rgba(255,128,181,0.4); } 50% { box-shadow: 0 0 40px rgba(255,128,181,0.8); } }
+  @keyframes modalPop { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<canvas id="bgCanvas"></canvas>
+<canvas id="confettiCanvas"></canvas>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div style="font-size: 4rem;">🎁</div>
+    <div class="message-title" style="margin-top:1rem">¡SORPRESA!</div>
+    <p style="color: var(--rosa-pastel); font-weight:600;">¡Mira a tu lado!<br>Te lo daré en persona ahora mismo. 💜</p>
+    <button class="btn-play" style="margin-top: 2rem; padding: 0.8rem 2rem; font-size: 1rem;" onclick="closeModal()">Cerrar ✨</button>
+  </div>
+</div>
+
+<div class="content">
+  <section class="hero">
+    <p class="hero-badge">✦ 19 de Mayo · Cumpleaños Especial ✦</p>
+    
+    <svg class="gengar-float" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M15 70 Q10 40 30 20 Q50 5 70 20 Q90 40 85 70 Q80 85 70 95 L65 110 L55 95 L45 110 L35 95 L25 110 Z" fill="#7c3aed"/>
+      <circle cx="37" cy="50" r="10" fill="white"/><circle cx="63" cy="50" r="10" fill="white"/>
+      <circle cx="40" cy="53" r="6" fill="#1a0030"/><circle cx="66" cy="53" r="6" fill="#1a0030"/>
+      <path d="M35 72 Q50 85 65 72" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    </svg>
+
+    <h1 class="hero-title">¡FELICES 16,<br>MI AMOR!</h1>
+    <p class="hero-sub">Tu día más especial 🌸</p>
+  </section>
+
+  <div class="glass-card">
+    <p class="message-title">💌 Para ti</p>
+    <p class="message-body">
+      Hola mi amor, te quiero desear un muy <em>feliz cumpleaños</em>.<br><br>
+      Tus 16, quiero que la pases muy bien y estoy muy feliz de estar contigo mi amor.
+      El día de hoy quiero recordarte lo mucho que <em>te amo</em> y lo muy feliz que me haces.<br><br>
+      Eres una gran mujer, una gran persona, <em>eres todo para mí</em>.
+      Espero que disfrutes mucho de tu día.
+    </p>
+    <p class="message-sign">Con amor, tu novio 💜</p>
+  </div>
+
+  <div class="buttons-section">
+    <button class="btn-play" onclick="triggerCelebration()">🎵 Play Celebración</button>
+    <button class="btn-regalo" onclick="openModal()">🎁 Ver regalo físico</button>
+  </div>
+
+  <footer class="footer">
+    <p>Hecho con 💜 para ti · 19 de Mayo</p>
+  </footer>
+</div>
+
+<script>
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX - 10 + 'px';
+  cursor.style.top = e.clientY - 10 + 'px';
+});
+
+const bgCanvas = document.getElementById('bgCanvas');
+const bgCtx = bgCanvas.getContext('2d');
+let particles = [];
+function resize() { bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight; }
+window.addEventListener('resize', resize); resize();
+
+for(let i=0; i<70; i++) {
+  particles.push({
+    x: Math.random()*bgCanvas.width, y: Math.random()*bgCanvas.height,
+    size: Math.random()*15+5, speed: Math.random()*0.5+0.2,
+    opacity: Math.random()
+  });
+}
+
+function animate() {
+  bgCtx.fillStyle = '#0a0010';
+  bgCtx.fillRect(0,0,bgCanvas.width, bgCanvas.height);
+  particles.forEach(p => {
+    bgCtx.fillStyle = `rgba(192, 38, 211, ${p.opacity})`;
+    bgCtx.beginPath(); bgCtx.arc(p.x, p.y, p.size/2, 0, Math.PI*2); bgCtx.fill();
+    p.y -= p.speed; if(p.y < -10) p.y = bgCanvas.height + 10;
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Confeti y Música
+function triggerCelebration() {
+  const conf = document.getElementById('confettiCanvas');
+  conf.classList.add('active');
+  playMelody();
+  setTimeout(() => conf.classList.remove('active'), 5000);
+}
+
+function playMelody() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const notes = [261, 261, 293, 261, 349, 329];
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.1, ctx.currentTime + i*0.5);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + i*0.5 + 0.4);
+    osc.start(ctx.currentTime + i*0.5);
+    osc.stop(ctx.currentTime + i*0.5 + 0.5);
+  });
+}
+
+function openModal() { document.getElementById('modalOverlay').classList.add('active'); triggerCelebration(); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+</script>
+</body>
+</html>
